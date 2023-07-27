@@ -16,14 +16,26 @@ use Inertia\Inertia;
 |
 */
 
+// Route::get('/', function () {
+//     return Inertia::render('Welcome', [
+//         'canLogin' => Route::has('login'),
+//         'canRegister' => Route::has('register'),
+//         'laravelVersion' => Application::VERSION,
+//         'phpVersion' => PHP_VERSION,
+//     ]);
+// });
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+    return Inertia::render('Home', [
+        
     ]);
-});
+})->middleware(['auth', 'verified']);
+
+Route::get('/write', function () {
+    return Inertia::render('Write', [
+
+    ]);
+})->middleware(['auth', 'verified']);
+
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
