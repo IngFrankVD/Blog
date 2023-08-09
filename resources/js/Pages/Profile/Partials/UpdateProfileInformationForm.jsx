@@ -11,6 +11,7 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
         name: user.name,
         email: user.email,
+        profileImg: user.picture,
     });
 
     const submit = (e) => {
@@ -58,6 +59,8 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
                         required
                         autoComplete="username"
                     />
+
+                    <img src={data.profileImg} alt="" />
 
                     <InputError className="mt-2" message={errors.email} />
                 </div>

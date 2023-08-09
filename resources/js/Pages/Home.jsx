@@ -1,5 +1,7 @@
 import Navbar from '../Layouts/Navbar'
 import Footer from '../Components/Footer';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Link } from '@inertiajs/react';
 
 const navigation = [
   { name: 'Product', href: '#' },
@@ -7,44 +9,40 @@ const navigation = [
   { name: 'Marketplace', href: '#' },
   { name: 'Company', href: '#' },
 ]
-const post = [
-    { id: '', title: 'Montañas bonitas', desc: '#', img: 'https://images.pexels.com/photos/12358219/pexels-photo-12358219.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', created_at: '', updated_at: '', user_id: '', cat: '' },
-    { id: '', title: 'Barquito', desc: '#', img: 'https://images.pexels.com/photos/16222199/pexels-photo-16222199/free-photo-of-ciudad-barcos-canal-urbano.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', created_at: '', updated_at: '', user_id: '', cat: '' },
-    { id: '', title: 'Landscape', desc: '#', img: 'https://images.pexels.com/photos/17293238/pexels-photo-17293238/free-photo-of-nieve-amanecer-paisaje-puesta-de-sol.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', created_at: '', updated_at: '', user_id: '', cat: '' },
-    { id: '', title: 'Autos B/N', desc: '#', img: 'https://images.pexels.com/photos/11734225/pexels-photo-11734225.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', created_at: '', updated_at: '', user_id: '', cat: '' },
-    { id: '', title: 'Moto', desc: '#', img: 'https://images.pexels.com/photos/15663496/pexels-photo-15663496/free-photo-of-casas-casa-vehiculo-puerta.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', created_at: '', updated_at: '', user_id: '', cat: '' },
-  ]
-  const callouts = [
-    {
-      name: 'Desk and Office',
-      description: 'Work from home accessories',
-      imageSrc: 'https://tailwindui.com/img/ecommerce-images/home-page-02-edition-01.jpg',
-      imageAlt: 'Desk with leather desk pad, walnut desk organizer, wireless keyboard and mouse, and porcelain mug.',
-      href: '#',
-    },
-    {
-      name: 'Self-Improvement',
-      description: 'Journals and note-taking',
-      imageSrc: 'https://tailwindui.com/img/ecommerce-images/home-page-02-edition-02.jpg',
-      imageAlt: 'Wood table with porcelain mug, leather journal, brass pen, leather key ring, and a houseplant.',
-      href: '#',
-    },
-    {
-      name: 'Travel',
-      description: 'Daily commute essentials',
-      imageSrc: 'https://tailwindui.com/img/ecommerce-images/home-page-02-edition-03.jpg',
-      imageAlt: 'Collection of four insulated travel bottles on wooden shelf.',
-      href: '#',
-    },
-  ]
 
-export default function Home() {
+export default function Home({Posts}) {
+
+  let cover ={ 
+    id: '',
+    title: '',
+    content: '',
+    coverImg: '',
+}
+
+  if(Posts[0]===undefined)
+  {
+     console.log('Posts is undefined')
+  }
+  else{    
+      console.log('Posts is defined')
+      cover.id = Posts[0].id
+      cover.title = Posts[0].title
+      cover.content = Posts[0].content
+      cover.coverImg = Posts[0].coverImg
+  }
+ 
+  const getText = (html) =>{
+    const doc = new DOMParser().parseFromString(html,"text/html")
+    return doc.body.textContent
+  }
+
+  
 
   return (
     <>
     <Navbar/>
 
-      <div style={{'--image-url': `url(${post[0].img})`}}  className='bg-[image:var(--image-url)] bg-cover relative isolate px-6 pt-14 lg:px-8"'>
+      <div style={{'--image-url': `url(${ Posts[0]===undefined ? '' : '/storage/posts/'+cover.coverImg })`}}  className='bg-[image:var(--image-url)]  h-[70vh] w-full bg-cover bg-center z-2 relative isolate px-6 pt-14 lg:px-8'>  
         <div
             
           className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
@@ -62,19 +60,19 @@ export default function Home() {
           
           <div className="text-center">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-              {post[0].title}
+              {cover.title}
             </h1>
-            <p className="mt-6 text-lg leading-8 text-gray-600">
-              {post[0].desc}
+            <p className=" truncate mt-6 text-lg leading-8 text-gray-600">
+             {getText(cover.content)}
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <a
-                href="write"
+                href={route('posts.create')}
                 className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 Escribir tu Blog
               </a>
-              <a href="#" className="rounded-md bg-zinc-100 px-3.5 py-2.5 text-sm font-semibold text-slate-950 shadow-sm hover:bg-zinc-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+              <a href={route('posts.show',cover.id)} className="rounded-md bg-zinc-100 px-3.5 py-2.5 text-sm font-semibold text-slate-950 shadow-sm hover:bg-zinc-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                 Ver Post completo <span aria-hidden="true">→</span>
               </a>
             </div>
@@ -102,22 +100,21 @@ export default function Home() {
           <h2 className="text-2xl font-bold text-gray-900">Popular Blogs</h2>
 
           <div className="mt-6 space-y-12 lg:grid lg:grid-cols-3 lg:gap-x-6 lg:space-y-0">
-            {callouts.map((callout) => (
-              <div key={callout.name} className="group relative">
+            {Posts.map((Post) => (
+              <div key={Post.id} className="group relative">
                 <div className="relative h-80 w-full overflow-hidden rounded-lg bg-white sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
                   <img
-                    src={callout.imageSrc}
-                    alt={callout.imageAlt}
+                    src={`/storage/posts/`+Post.coverImg}
                     className="h-full w-full object-cover object-center"
                   />
                 </div>
                 <h3 className="mt-6 text-sm text-gray-500">
-                  <a href={callout.href}>
+                  <a href={"/posts/"+Post.id}>
                     <span className="absolute inset-0" />
-                    {callout.name}
+                    {Post.title}
                   </a>
                 </h3>
-                <p className="text-base font-semibold text-gray-900">{callout.description}</p>
+                <p className="text-base font-semibold text-gray-900">{Post.title}</p>
               </div>
             ))}
           </div>

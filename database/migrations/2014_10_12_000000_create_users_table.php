@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('picture')->default('https://img.freepik.com/free-icon/user_318-804790.jpg?w=2000');;
             $table->string('role')->default('client');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

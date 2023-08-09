@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PostController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -24,22 +27,14 @@ use Inertia\Inertia;
 //         'phpVersion' => PHP_VERSION,
 //     ]);
 // });
-Route::get('/', function () {
-    return Inertia::render('Home', [
-        
-    ]);
-})->middleware(['auth', 'verified']);
 
-Route::get('/write', function () {
-    return Inertia::render('Write', [
+Route::resource('posts', PostController::class)->only(['index', 'create', 'show', 'edit', 'store', 'destroy'])
+    ->middleware(['auth', 'verified']);
 
-    ]);
-})->middleware(['auth', 'verified']);
+Route::post('posts/{post}', [PostController::class, 'update'])->name('posts.update')
+    ->middleware(['auth', 'verified']);
 
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

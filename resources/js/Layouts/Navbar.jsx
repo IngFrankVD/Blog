@@ -1,8 +1,9 @@
 import { Fragment } from 'react'
 import { useState } from 'react'
+import { Link, usePage } from '@inertiajs/react';
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import JohletIcon from '../../img/Johlett.png'
+import NavLink from '@/Components/NavLink';
 
 import { Dialog } from '@headlessui/react'
 
@@ -19,17 +20,18 @@ function classNames(...classes) {
 }
 
 export default function Example() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const user = usePage().props.auth.user;
   return (
     <>
-    <Disclosure as="nav" className=" mt-0 absolute inset-x-0 top-0 z-50 ">
+    <Disclosure as="nav" className=" bg-white mt-0  sticky inset-x-0 top-0 z-50 ">
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
             <div className="relative flex h-16 items-center justify-between">
               <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                 {/* Mobile menu button*/}
-                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-100 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
                     <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -39,48 +41,44 @@ export default function Example() {
                 </Disclosure.Button>
               </div>
               <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                <div className="flex flex-shrink-0 items-center">
-                  <img
+                <div className="flex font-bold flex-shrink-0 items-center">
+                  {/* <img
                     className="h-8 w-auto"
                     src={JohletIcon}
                     alt="Your Company"
-                  />
+                  /> */}
+                  <a href={route('posts.index')}> Johlet </a>
                 </div>
                 <div className="hidden sm:ml-6 w-3/4 sm:block">
                   <div className="flex justify-center space-x-4">
-                    {navigation.map((item) => (
-                      <a
-                        key={item.name}
-                        href={item.href}
-                        className={classNames(
-                          item.current ? ' border-b-2 text-white' : 'text-white ',
-                          ' px-3 py-2 text-sm font-medium hover:text-gray-700'
-                        )}
-                        aria-current={item.current ? 'page' : undefined}
-                      >
-                        {item.name}
-                      </a>
-                    ))}
+                  <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                          <NavLink href={route('posts.index')} active={route().current('posts.index')}>
+                                    Home
+                                </NavLink>
+                            </div>
+             
                   </div>
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                 <button
                   type="button"
-                  className="rounded-full p-1 text-white focus:outline-none focus:ring-2 focus:ring-white"
+                  className="rounded-full p-1 text-zinc-800 focus:outline-none focus:ring-2 focus:ring-slate-800"
                 >
                   <span className="sr-only">View notifications</span>
                   <BellIcon className="h-6 w-6" aria-hidden="true" />
                 </button>
 
+                
+
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3">
                   <div>
-                    <Menu.Button className="flex rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-white ">  {/*focus:ring-offset-2 focus:ring-offset-gray-800*/}
+                    <Menu.Button className="flex rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-slate-800 ">  {/*focus:ring-offset-2 focus:ring-offset-gray-800*/}
                       <span className="sr-only">Open user menu</span>
                       <img
                         className="h-8 w-8 rounded-full"
-                        src="https://scontent.fpbc1-1.fna.fbcdn.net/v/t39.30808-6/343990479_987532992240969_5654717634768717888_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=ORAyRjRle7EAX-jRfXE&_nc_ht=scontent.fpbc1-1.fna&oh=00_AfCXmd4gmQWQzGh0pxAJNVMOwZFNIAo4jjNPTjSe41K5Cg&oe=64C320DD"
+                        src={user.picture}
                         alt=""
                       />
                     </Menu.Button>
@@ -97,32 +95,22 @@ export default function Example() {
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       <Menu.Item>
                         {({ active }) => (
-                          <a
-                            href="#"
-                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
-                          >
-                            Your Profile
-                          </a>
+
+                          <Link href={route('profile.edit')} 
+                          className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}>
+                            Profile
+                          </Link>
+                          
                         )}
                       </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
-                          <a
-                            href="#"
-                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
-                          >
-                            Settings
-                          </a>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            href="#"
-                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
-                          >
-                            Sign out
-                          </a>
+
+                          <Link href={route('logout')} method="post" as="button"
+                          className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}>
+                            LogOut
+                          </Link>
+                      
                         )}
                       </Menu.Item>
                     </Menu.Items>
@@ -133,6 +121,7 @@ export default function Example() {
           </div>
 
           <Disclosure.Panel className="sm:hidden">
+
             <div className="space-y-1 px-2 pb-3 pt-2">
               {navigation.map((item) => (
                 <Disclosure.Button
@@ -154,7 +143,12 @@ export default function Example() {
       )}
     </Disclosure>
 
-    <header className=" mt-10 absolute inset-x-0 top-0 z-50">
+
+
+    {/* Segundo nav bar comentado */}
+
+
+    {/* <header className=" mt-10 absolute inset-x-0 top-0 z-50">
         <nav className="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
           <div className="flex lg:flex-1">
             <a href="#" className="-m-1.5 p-1.5">
@@ -235,7 +229,7 @@ export default function Example() {
             </div>
           </Dialog.Panel>
         </Dialog>
-      </header>
+      </header> */}
     </>
   )
 }
