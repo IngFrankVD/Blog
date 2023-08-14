@@ -8,7 +8,9 @@ use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\DB;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Storage;
+
 
 class PostController extends Controller
 {
@@ -46,35 +48,44 @@ class PostController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-    //     $title = $request->input('title');
-    // $content = $request->input('content');
-    // $categories_id = $request->input('categories_id');
-    // $coverImg = $request->file('coverImg');
-    // $blogImages = $request->input('blogImages');
-    
-        // Output and inspect the received images
-        //dd($blogImages);
-        dd($request->all());
-        // $validated = $request->validate([
-        //     'title' => 'required|string|max:255',
-        //     'content' => 'required|string',
-        //     'categories_id' => 'required',
-        //     'coverImg' => 'required|image|mimes:jpeg,png,jpg,gif', // Validate image file (optional)
-        // ]);
+        // dd($request->all());
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'categories_id' => 'required',
+            'coverImg' => 'required|image|mimes:jpeg,png,jpg,gif', // Validate image file (optional)
+        ]);
 
-        // if ($request->hasFile('coverImg')) {
-        //     // Save the image with a custom filename and store its path
-        //     $imageName = time() . '_' . $request->file('coverImg')->getClientOriginalName();
-        //     $imagePath = $request->file('coverImg')->storeAs('public/posts', $imageName);
+        if ($request->hasFile('coverImg')) {
+            // Save the image with a custom filename and store its path
+            $imageName = time() . '_' . $request->file('coverImg')->getClientOriginalName();
+            $imagePath = $request->file('coverImg')->storeAs('public/posts', $imageName);
     
-        //     // Add the image filename to the validated data
-        //     $validated['coverImg'] = $imageName;
-        // }
+            // Add the image filename to the validated data
+            $validated['coverImg'] = $imageName;
+        } 
+        
+            // Guardar los Blobs generados por Froala localmente
+    $blobUrls = $request->input('blogImages');
 
+    foreach ($blobUrls as $index => $blobUrl) {
+        $blobData = $request->input('blob_' . $index); // Cambia 'blob_' por el prefijo correcto en tus campos
+
+        if ($blobData) {
+            $nombreArchivoBlob = 'blob_image_' . $index . '.jpg'; // Cambia el nombre y la extensión
+
+            try {
+                Storage::put('public/posts/' . $nombreArchivoBlob, base64_decode($blobData));
+            } catch (\Exception $e) {
+                // Manejar la excepción, imprimir mensajes de error, etc.
+            }
+            
+        }
+    }
+
+        $request->user()->posts()->create($validated);
  
-        // $request->user()->posts()->create($validated);
- 
-        // return redirect(route('posts.index'));
+        return redirect(route('posts.index'));
     }
 
     public function edit($postId): Response

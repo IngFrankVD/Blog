@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ImageController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -34,6 +35,8 @@ Route::resource('posts', PostController::class)->only(['index', 'create', 'show'
 Route::post('posts/{post}', [PostController::class, 'update'])->name('posts.update')
     ->middleware(['auth', 'verified']);
 
+
+Route::post('/upload-image', [ImageController::class,'upload'] )->name('upload-image.upload'); // Asegúrate de ajustar el controlador y el método correspondientes
 
 
 Route::middleware('auth')->group(function () {

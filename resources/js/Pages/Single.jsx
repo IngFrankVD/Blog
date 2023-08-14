@@ -104,11 +104,11 @@ console.log(data.id)
             </div>
             <br />
             <h1 className='mt-10 mb-10 text-3xl font-black' > {data.title} </h1>
-            <FroalaEditorView model={data.content} />
+            <div>
+              <FroalaEditorView model={data.content} />
+            </div>
       </div>
       
-
-
       <Footer/>
     </>
   )

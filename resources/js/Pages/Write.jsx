@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
 import FroalaEditorComponent from 'react-froala-wysiwyg';
-import FroalaEditor from 'react-froala-wysiwyg';
+import axios from 'axios'; // Importa Axios para manejar las solicitudes HTTP
 import NavBar from '../Layouts/Navbar';
 import PrimaryButton from '@/Components/PrimaryButton';
 import InputError from '@/Components/InputError';
@@ -16,39 +16,43 @@ import 'froala-editor/css/froala_style.min.css';
 
 
 export default function write({ Post }) {
+  
   const [previewImageUrl, setPreviewImageUrl] = useState('');
   const [uploadedImages, setUploadedImages] = useState([]);
   const [content, setContent] = useState('');
 
-  const {data, setData, post, reset, errors } = useForm({
+  const { data, setData, post, reset, errors } = useForm({
     title: '',
-    content: content,
+    content: '',
     categories_id: 1,
     coverImg: '',
-    blogImages: uploadedImages,
+    blogImages: [],
   });
 
+  useEffect(() => {
+    // Update 'blogImages' in 'data' whenever 'uploadedImages' changes
+    setData('blogImages', uploadedImages);
+  }, [uploadedImages]);
+
   const handleImageExtraction = (newContent) => {
-    const regex = /<img.*?src=["'](.*?)["']/g;
-    let match;
-    const newImages = [];
+    // Extract image URLs from the newContent using regex (similar to the previous response)
+    const imgTags = newContent.match(/<img[^>]+src="([^">]+)"/g);
+    const imageUrls = imgTags.map(tag => {
+      const srcMatch = tag.match(/src="([^">]+)"/);
+      return srcMatch[1];
+    });
 
-    while ((match = regex.exec(newContent)) !== null) {
-      newImages.push(match[1]);
-    }
-
-    setUploadedImages(newImages);
-    console.log(newImages)
+    // Update the uploadedImages state with the extracted image URLs
+    setUploadedImages(imageUrls);
   };
-
+  
   const handleContentChanged = (newContent) => {
     setContent(newContent);
-    handleImageExtraction(newContent);
-    setData('content', newContent)
-    setData('blogImages', uploadedImages);
-    console.log(data)
+    handleImageExtraction(newContent); // Call handleImageExtraction with newContent
+    setData('content', newContent); // Update data with newContent
   };
-
+  
+  
   const handleImageChange = (e) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
@@ -60,10 +64,40 @@ export default function write({ Post }) {
     reader.readAsDataURL(selectedFile);
   };
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
+
+    // Send images to the server and get updated image URLs
+    const updatedImageUrls = await uploadImages(uploadedImages);
+
+    // Update the content with the new image URLs
+    const updatedContent = content.replace(
+      /<img[^>]+src="([^">]+)"/g,
+      (_, src) => `<img src="${updatedImageUrls[src]}"`);
+      
+    // Update 'data' with the new content and image URLs
+    setData('content', updatedContent);
+    setData('blogImages', updatedImageUrls);
+
+    // Send the rest of the form data to the server
     post(route('posts.store'), { onSuccess: () => reset() });
-};
+  };
+
+  const uploadImages = async (imageUrls) => {
+    const newImageUrls = {};
+  
+    // Loop through each image URL and upload it to the server
+    for (const imageUrl of imageUrls) {
+      try {
+        const response = await axios.post('/upload-image', { imageUrl });
+        newImageUrls[imageUrl] = response.data.newImageUrl;
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
+    }
+  
+    return newImageUrls;
+  };
 
   
   return (
